@@ -10,3 +10,13 @@ userForm.loginFormCallback = data => {
         }
     })
 }
+
+userForm.registerFormCallback = data => {
+    ApiConnector.register(data, response => {
+        if (response.success == true) {
+            location.reload();
+        } else {
+            userForm.setLoginErrorMessage(response.error)
+        }
+    })
+}
