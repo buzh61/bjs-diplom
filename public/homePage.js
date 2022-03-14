@@ -3,18 +3,15 @@ const logout = new LogoutButton();
 
 logout.action = () => {
     ApiConnector.logout(response => {
-        if (response.success === true) {
+        if (response.success) {
             location.reload();
-        } else {
-            errorMessage = response.error;
-            userForm.setLoginErrorMessage(errorMessage);
         }
     })
 }
 
 // Профиль
 ApiConnector.current(response => {
-    if (response.success === true) {
+    if (response.success) {
         ProfileWidget.showProfile(response.data);
     }
 })
@@ -23,25 +20,27 @@ ApiConnector.current(response => {
 const rates = new RatesBoard();
 
 stocks = () => ApiConnector.getStocks(response => {
-    if (response.success === true) {
+    if (response.success) {
         rates.clearTable();
         return rates.fillTable(response.data);
     }
 });
 
 stocks();
-setInterval(() => stocks(), 60000);
+setInterval(stocks, 60000);
 
 // Пополнение кошелька
 const money = new MoneyManager();
 
 money.addMoneyCallback = data => {
     ApiConnector.addMoney(data, response => {
-        if (response.success === true) {
+        if (response.success) {
+            console.log(response)
             ProfileWidget.showProfile(response.data);
             money.setMessage(response.success, "Кошелёк успешно пополнен")
         } else {
-            money.setMessage(response.success, "Не удалось пополнить кошелёк")
+            console.log(response)
+            money.setMessage(response.success, response.error)
         }
     })
 }
@@ -49,11 +48,11 @@ money.addMoneyCallback = data => {
 // Конвертация валюты
 money.conversionMoneyCallback = data => {
     ApiConnector.convertMoney(data, response => {
-        if (response.success === true) {
+        if (response.success) {
             ProfileWidget.showProfile(response.data);
             money.setMessage(response.success, "Валюта успешно конвертирована")
         } else {
-            money.setMessage(response.success, "Ошибка конвертирования валюты")
+            money.setMessage(response.success, response.error)
         }
     })
 }
@@ -61,11 +60,11 @@ money.conversionMoneyCallback = data => {
 // Перевод валюты
 money.sendMoneyCallback = data => {
     ApiConnector.transferMoney(data, response => {
-        if (response.success === true) {
+        if (response.success) {
             ProfileWidget.showProfile(response.data);
             money.setMessage(response.success, "Валюта успешно переведена")
         } else {
-            money.setMessage(response.success, "Ошибка перевода валюты")
+            money.setMessage(response.success, response.error)
         }
     })
 }
@@ -74,7 +73,7 @@ money.sendMoneyCallback = data => {
 const users = new FavoritesWidget();
 
 ApiConnector.getFavorites(response => {
-    if (response.success === true) {
+    if (response.success) {
         console.log(response)
         users.clearTable();
         users.fillTable(response.data)
@@ -84,26 +83,26 @@ ApiConnector.getFavorites(response => {
 
 users.addUserCallback = data => {
     ApiConnector.addUserToFavorites(data, response => {
-        if (response.success === true) {
+        if (response.success) {
             users.clearTable();
             users.fillTable(response.data)
             money.updateUsersList(response.data)
             users.setMessage(response.success, "Пользователь добавлен")
         } else {
-            users.setMessage(response.success, "Ошибка добавления пользователя")
+            users.setMessage(response.success, response.error)
         }
     })
 }
 
 users.removeUserCallback  = data => {
     ApiConnector.removeUserFromFavorites(data, response => {
-        if (response.success === true) {
+        if (response.success) {
             users.clearTable();
             users.fillTable(response.data)
             money.updateUsersList(response.data)
             users.setMessage(response.success, "Пользователь удалён")
         } else {
-            users.setMessage(response.success, "Ошибка удаления пользователя")
+            users.setMessage(response.success, response.error)
         }
     })
 }
